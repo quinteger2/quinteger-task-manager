@@ -1,3 +1,8 @@
+# Quinteger-Task-Manager
+
+Draggable Tasks, knows what day it is, other fun features to come
+
+CRA Boilerplate below:
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
