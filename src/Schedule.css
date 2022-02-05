@@ -1,0 +1,13 @@
+.addWidget {
+    display: flex;
+    flex-direction: column;
+    border-radius: 1rem;
+    border: 2px solid black;
+    padding: 1rem .5rem;
+    margin: .5rem 0;
+    
+  }
+
+.addWidget input {
+    font-size: 1rem;
+}

@@ -1,18 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { itemsFromBackend } from "./data.js";
 import { v4 as uuid } from "uuid";
-
-function Item(props) {
-  if (props.item.date !== undefined)
-    return (
-      <>
-        <p>{props.item.content}</p>
-        <p>{props.item.date.toLocaleDateString("en-US")}</p>
-      </>
-    );
-  else return <p>{props.item.content}</p>;
-}
+import TaskList from "./TaskList.js";
+import "./Schedule.css";
+import Task from "./Task.js";
 
 const onDragEnd = (result, columns, setColumns, items, setItems) => {
   if (!result.destination) return;
@@ -37,9 +29,7 @@ const onDragEnd = (result, columns, setColumns, items, setItems) => {
       },
     });
 
-    //Change the date to match the destColumn's date
-
-    console.log(destination.droppableId);
+    //Change the task's date to match the destination's date
 
     const _items = [...items];
 
@@ -48,33 +38,10 @@ const onDragEnd = (result, columns, setColumns, items, setItems) => {
       destItems.forEach((columnItem) => {
         if (task.id === columnItem.id) {
           changedTask.date = new Date(parseInt(destination.droppableId, 10));
-          //console.log(task.id + ' ' + columnItem.date)//(task.content + ' ' + columnItem.date)
-          console.log(destination.droppableId)
+          console.log(destination.droppableId);
         }
-
       });
     });
-    /*
-    const newItems = _items.map((bigListItem) => {
-
-      var itemToChange = {}
-
-      destItems.forEach((smallListItem) => {
-        console.log(smallListItem.id === bigListItem.id)
-        if (smallListItem.id === bigListItem.id)
-          console.log(smallListItem.content + ' ' + smallListItem.date)
-          itemToChange = smallListItem
-      })
-
-      if(itemToChange == {})
-        return bigListItem
-      else
-        return itemToChange
-
-
-    });
-
-    //console.log(newItems);*/
   } else {
     const column = columns[source.droppableId];
     const copiedItems = [...column.items];
@@ -90,26 +57,12 @@ const onDragEnd = (result, columns, setColumns, items, setItems) => {
   }
 };
 
-function Schedule() {
-  const [columns, setColumns] = useState([]);
+function Schedule(props) {
   const [items, setItems] = useState(itemsFromBackend);
   const [newContent, setNewContent] = useState("");
   const [newTaskDate, setNewTaskDate] = useState("");
   const [newProject, setNewProject] = useState("No Project");
-
-  function TaskList(props) {
-    const _items = props.items
-      .sort((a, b) => {
-        return a.content.toLowerCase() > b.content.toLowerCase();
-      })
-      .map((item) => (
-        <p>{`${item.content} (${item.date.toLocaleDateString()}, ${
-          item.percentComplete
-        }%)`}</p>
-      ));
-    return _items;
-  }
-
+  /*
   useEffect(() => {
     console.log(
       "Use Effect! " +
@@ -117,47 +70,44 @@ function Schedule() {
         " days, " +
         Object.keys(items).length +
         " tasks"
-    );
-    //Convert state's columns object to array to find the "Unassigned" column
-    const _columns = Object.entries(columns);
+    );*/
 
-    const newColumns = [];
-    var i = 0;
+  //Rebuild columns every render
+  const newColumns = [];
+  var i = 0;
 
-    var today = new Date().setHours(0, 0, 0, 0);
+  const dayInMilliseconds = 24 * 60 * 60 * 1000;
 
-    const dayInMilliseconds = 24 * 60 * 60 * 1000;
+  for (i = 0; i < 4; i++) {
+    newColumns.push([
+      props.startDate + dayInMilliseconds * i,
+      {
+        items: [],
+      },
+    ]);
+  }
 
-    for (i = 0; i < 4; i++) {
-      newColumns.push([
-        today + dayInMilliseconds * i,
-        {
-          items: [],
-        },
-      ]);
-    }
-
-    //Loop through the tasks
-    items.forEach((task) => {
-      //Loop through the columns to find the appropriate one for this item
-      newColumns.forEach((column) => {
-        if (task.date !== undefined) {
-          if (column[0] === task.date.getTime()) {
-            column[1].items.push(task);
-          }
+  //Loop through the tasks
+  items.forEach((task) => {
+    //Loop through the columns to find the appropriate one for this item
+    newColumns.forEach((column) => {
+      if (task.date !== undefined) {
+        if (column[0] === task.date.getTime()) {
+          column[1].items.push(task);
         }
-      });
+      }
     });
+  });
 
-    //Back to an object of objects
-    const result = {};
+  //Back to an object of objects
+  const result = {};
 
-    newColumns.forEach((obj) => {
-      result[obj[0]] = obj[1];
-    });
+  newColumns.forEach((obj) => {
+    result[obj[0]] = obj[1];
+  });
 
-    setColumns(result);
-  }, [items]);
+  const [columns, setColumns] = useState(result);
+  //}, [items]);
 
   const onChangeContent = (event) => {
     setNewContent(event.target.value);
@@ -189,26 +139,19 @@ function Schedule() {
 
   return (
     <div style={{ display: "flex", justifyContent: "center", height: "100%" }}>
+      {props.startDate}
       <div
         className="controlPanel"
         style={{
           display: "flex",
           justifyContent: "start",
           flexDirection: "column",
+          alignItems: "center"
         }}
       >
         <h2>Manage Tasks</h2>
-        <div
-          className="addWidget"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            borderRadius: "1em",
-            border: "2px solid black",
-            padding: "1em 0",
-            margin: ".5em 0",
-          }}
-        >
+        <div className="addWidget">
+          <h3>Add Task</h3>
           <input
             type="text"
             className="newContent"
@@ -295,7 +238,7 @@ function Schedule() {
                                       ...provided.draggableProps.style,
                                     }}
                                   >
-                                    <Item item={item} />
+                                    <Task task={item} />
                                   </div>
                                 );
                               }}
