@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { itemsFromBackend } from "./data.js";
 import { v4 as uuid } from "uuid";
@@ -38,7 +38,6 @@ const onDragEnd = (result, columns, setColumns, items, setItems) => {
       destItems.forEach((columnItem) => {
         if (task.id === columnItem.id) {
           changedTask.date = new Date(parseInt(destination.droppableId, 10));
-          console.log(destination.droppableId);
         }
       });
     });
@@ -62,53 +61,48 @@ function Schedule(props) {
   const [newContent, setNewContent] = useState("");
   const [newTaskDate, setNewTaskDate] = useState("");
   const [newProject, setNewProject] = useState("No Project");
-  /*
+  const [columns, setColumns] = useState({});
+
   useEffect(() => {
-    console.log(
-      "Use Effect! " +
-        Object.keys(columns).length +
-        " days, " +
-        Object.keys(items).length +
-        " tasks"
-    );*/
+    //Rebuild columns every render
+    const newColumns = [];
+    var i = 0;
 
-  //Rebuild columns every render
-  const newColumns = [];
-  var i = 0;
+    const dayInMilliseconds = 24 * 60 * 60 * 1000;
 
-  const dayInMilliseconds = 24 * 60 * 60 * 1000;
+    for (i = 0; i < 4; i++) {
+      newColumns.push([
+        props.startDate + dayInMilliseconds * i,
+        {
+          items: [],
+        },
+      ]);
+    }
 
-  for (i = 0; i < 4; i++) {
-    newColumns.push([
-      props.startDate + dayInMilliseconds * i,
-      {
-        items: [],
-      },
-    ]);
-  }
-
-  //Loop through the tasks
-  items.forEach((task) => {
-    //Loop through the columns to find the appropriate one for this item
-    newColumns.forEach((column) => {
-      if (task.date !== undefined) {
-        if (column[0] === task.date.getTime()) {
-          column[1].items.push(task);
+    //Loop through the tasks
+    items.forEach((task) => {
+      //Loop through the columns to find the appropriate one for this item
+      newColumns.forEach((column) => {
+        if (task.date !== undefined) {
+          if (column[0] === task.date.getTime()) {
+            column[1].items.push(task);
+          }
         }
-      }
+      });
     });
-  });
 
-  //Back to an object of objects
-  const result = {};
+    //Back to an object of objects
+    const result = {};
 
-  newColumns.forEach((obj) => {
-    result[obj[0]] = obj[1];
-  });
+    newColumns.forEach((obj) => {
+      result[obj[0]] = obj[1];
+    });
+    console.log(result);
+    setColumns(result);
+  }, [props.startDate]);
 
-  const [columns, setColumns] = useState(result);
-  //}, [items]);
-
+  console.log(columns);
+  
   const onChangeContent = (event) => {
     setNewContent(event.target.value);
   };
@@ -139,14 +133,13 @@ function Schedule(props) {
 
   return (
     <div style={{ display: "flex", justifyContent: "center", height: "100%" }}>
-      {props.startDate}
       <div
         className="controlPanel"
         style={{
           display: "flex",
           justifyContent: "start",
           flexDirection: "column",
-          alignItems: "center"
+          alignItems: "center",
         }}
       >
         <h2>Manage Tasks</h2>
