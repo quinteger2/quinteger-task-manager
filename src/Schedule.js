@@ -5,6 +5,18 @@ import { v4 as uuid } from "uuid";
 import TaskList from "./TaskList.js";
 import "./Schedule.css";
 import Task from "./Task.js";
+import {
+  getDocs,
+  onSnapshot,
+  collection,
+  addDoc,
+  setDoc,
+  updateDoc,
+  doc,
+  Timestamp,
+  docRef,
+} from "firebase/firestore";
+import db from "./firebase";
 
 const onDragEnd = (result, columns, setColumns, items, setItems) => {
   if (!result.destination) return;
@@ -33,11 +45,19 @@ const onDragEnd = (result, columns, setColumns, items, setItems) => {
 
     const _items = [...items];
 
+    async function updateDate(ref, newDate) {
+      await updateDoc(ref, {
+        date: newDate
+      });
+    }
+
     _items.forEach((task) => {
       var changedTask = task;
       destItems.forEach((columnItem) => {
         if (task.id === columnItem.id) {
           changedTask.date = new Date(parseInt(destination.droppableId, 10));
+          const ref = doc(db, "tasks", task.id)
+          updateDate(ref, new Date(parseInt(destination.droppableId, 10)))
         }
       });
     });
@@ -57,7 +77,7 @@ const onDragEnd = (result, columns, setColumns, items, setItems) => {
 };
 
 function Schedule(props) {
-  const [items, setItems] = useState(itemsFromBackend);
+  const [items, setItems] = useState([]);
   const [newContent, setNewContent] = useState("");
   const [newTaskDate, setNewTaskDate] = useState("");
   const [newProject, setNewProject] = useState("No Project");
@@ -97,12 +117,47 @@ function Schedule(props) {
     newColumns.forEach((obj) => {
       result[obj[0]] = obj[1];
     });
-    console.log(result);
-    setColumns(result);
-  }, [props.startDate]);
 
-  console.log(columns);
-  
+    setColumns(result);
+  }, [props.startDate, items]);
+
+  useEffect(() => {
+    /*const [items, setItems] = useState([]);
+
+    {
+      id: uuid(),
+      content: "First task",
+      date: new Date("February 3, 2022"),
+      column: "Unassigned",
+      project: "First Project",
+      percentComplete: 10,
+    }*/
+
+    const _items = []
+
+    async function inside() {
+      const querySnapshot = await getDocs(collection(db, "tasks"));
+      querySnapshot.forEach((doc) => {
+        const currentTask = {}
+        // doc.data() is never undefined for query doc snapshots
+        //console.log(doc.id, " => ", doc.data());
+        console.log(doc.data().id)
+        currentTask.id = doc.data().id
+        currentTask.content = doc.data().content
+        currentTask.date = new Date(doc.data().date.seconds*1000) //need to get the date from Firestore's format into a proper date object
+        currentTask.project = doc.data().project
+        currentTask.percentComplete = doc.data().percentComplete
+        _items.push(currentTask)
+      });
+    }
+    console.log('before')
+    inside().then(() => {
+      console.log('after')
+      console.log(_items)
+      setItems(_items)
+    });
+  },[]);
+
   const onChangeContent = (event) => {
     setNewContent(event.target.value);
   };
@@ -116,19 +171,31 @@ function Schedule(props) {
   };
 
   function handleAdd() {
-    //Convert state's columns object to array to find the "Unassigned" column
-
     const _items = [...items];
 
-    _items.push({
+    const newTask = {
       id: uuid(),
       content: newContent,
       date: new Date(newTaskDate),
       project: newProject,
       percentComplete: 0,
-    });
+    };
+
+    _items.push(newTask);
 
     setItems(_items);
+    async function doIt() {
+      //const citiesRef = collection(db, "cities");
+
+      //if you want an auto generated id
+      //const docRef = await addDoc(collection(db, "tasks"), docData);
+      //console.log("Document written with ID: ", docRef.id);
+
+      //If you want to set the id yourself
+      await setDoc(doc(db, "tasks", newTask.id), newTask);
+    }
+
+    doIt();
   }
 
   return (
@@ -200,10 +267,15 @@ function Schedule(props) {
                         style={{
                           background: snapshot.isDraggingOver
                             ? "lightblue"
+                            : new Date(parseInt(columnId, 10)).getDay() === 0 ||
+                              new Date(parseInt(columnId, 10)).getDay() === 6
+                            ? "orange"
                             : "lightgrey",
                           padding: 4,
                           width: 250,
                           minHeight: 500,
+                          borderRadius: "1rem",
+                          boxShadow: ".8rem .8rem .8rem .2rem #364E8E",
                         }}
                       >
                         {column.items.map((item, index) => {
@@ -229,6 +301,7 @@ function Schedule(props) {
                                         : "#456C86",
                                       color: "white",
                                       ...provided.draggableProps.style,
+                                      borderRadius: "1rem",
                                     }}
                                   >
                                     <Task task={item} />

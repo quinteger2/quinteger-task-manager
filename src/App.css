@@ -3,6 +3,38 @@
 }
 
 .App {
-  margin: 2em;
-  padding: 2em;
+  margin: 1.5rem;
+  padding: 1.5rem;
+}
+
+input {
+  font-size: 1.5rem;
+}
+
+button {
+  font-size: 1.5rem;
+  border-radius: 1rem;
+  padding: 0.2rem;
+  border: none;
+  background: none;
+  background-color: hsl(256, 59%, 37%);
+  color: white;
+}
+
+.DatePicker {
+  border-radius: 5rem;
+}
+
+.DatePickerExample {
+  display: flex;
+  flex-direction: row;
+}
+
+.appTitle {
+  margin: 0 auto;
+  width: 20rem;
+  border-radius: 0.5rem;
+  box-shadow: 0rem 0.8rem 0.8rem 0.2rem hsl(256, 65%, 54%);
+  padding: 0.5rem;
+  border: 0.1rem solid black;
 }
