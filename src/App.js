@@ -6,6 +6,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 // CSS Modules, react-datepicker-cssmodules.css
 // import 'react-datepicker/dist/react-datepicker-cssmodules.css';
+import db from "./firebase";
 
 const DatePickerExample = (props) => {
   const [_date, setDate] = useState(new Date(props.startDate));

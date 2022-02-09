@@ -5,15 +5,16 @@ import { getFirestore } from "firebase/firestore";
 
 // TODO: Replace the following with your app's Firebase project configuration
 const firebaseConfig = {
-  apiKey: REACT_FIREBASE_apiKey,
-  authDomain: REACT_FIREBASE_authDomain,
-  projectId: REACT_FIREBASE_projectId,
-  storageBucket: REACT_FIREBASE_storageBucket,
-  messagingSenderId: REACT_FIREBASE_messagingSenderId,
-  appId: REACT_FIREBASE_appId,
-  measurementId: REACT_FIREBASE_measurementId
+  apiKey: process.env.REACT_APP_FIREBASE_apiKey,
+  authDomain: process.env.REACT_APP_FIREBASE_authDomain,
+  projectId: process.env.REACT_APP_FIREBASE_projectId,
+  storageBucket: process.env.REACT_APP_FIREBASE_storageBucket,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_messagingSenderId,
+  appId: process.env.REACT_APP_FIREBASE_appId,
+  measurementId: process.env.REACT_APP_FIREBASE_measurementId
 };
 
+console.log(process.env)
 
 // // Get a list of cities from your database
 // async function getCities(db) {

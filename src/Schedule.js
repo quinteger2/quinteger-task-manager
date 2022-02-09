@@ -122,16 +122,6 @@ function Schedule(props) {
   }, [props.startDate, items]);
 
   useEffect(() => {
-    /*const [items, setItems] = useState([]);
-
-    {
-      id: uuid(),
-      content: "First task",
-      date: new Date("February 3, 2022"),
-      column: "Unassigned",
-      project: "First Project",
-      percentComplete: 10,
-    }*/
 
     const _items = []
 
@@ -139,8 +129,6 @@ function Schedule(props) {
       const querySnapshot = await getDocs(collection(db, "tasks"));
       querySnapshot.forEach((doc) => {
         const currentTask = {}
-        // doc.data() is never undefined for query doc snapshots
-        //console.log(doc.id, " => ", doc.data());
         console.log(doc.data().id)
         currentTask.id = doc.data().id
         currentTask.content = doc.data().content
@@ -184,8 +172,8 @@ function Schedule(props) {
     _items.push(newTask);
 
     setItems(_items);
-    async function doIt() {
-      //const citiesRef = collection(db, "cities");
+    async function writeData() {
+      
 
       //if you want an auto generated id
       //const docRef = await addDoc(collection(db, "tasks"), docData);
@@ -195,7 +183,7 @@ function Schedule(props) {
       await setDoc(doc(db, "tasks", newTask.id), newTask);
     }
 
-    doIt();
+    writeData();
   }
 
   return (
