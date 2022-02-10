@@ -17,6 +17,7 @@ import {
   docRef,
 } from "firebase/firestore";
 import db from "./firebase";
+import EditTask from "./EditTask.js";
 
 const onDragEnd = (result, columns, setColumns, items, setItems) => {
   if (!result.destination) return;
@@ -47,7 +48,7 @@ const onDragEnd = (result, columns, setColumns, items, setItems) => {
 
     async function updateDate(ref, newDate) {
       await updateDoc(ref, {
-        date: newDate
+        date: newDate,
       });
     }
 
@@ -56,8 +57,8 @@ const onDragEnd = (result, columns, setColumns, items, setItems) => {
       destItems.forEach((columnItem) => {
         if (task.id === columnItem.id) {
           changedTask.date = new Date(parseInt(destination.droppableId, 10));
-          const ref = doc(db, "tasks", task.id)
-          updateDate(ref, new Date(parseInt(destination.droppableId, 10)))
+          const ref = doc(db, "tasks", task.id);
+          updateDate(ref, new Date(parseInt(destination.droppableId, 10)));
         }
       });
     });
@@ -82,6 +83,7 @@ function Schedule(props) {
   const [newTaskDate, setNewTaskDate] = useState("");
   const [newProject, setNewProject] = useState("No Project");
   const [columns, setColumns] = useState({});
+  const [currentTask, setCurrentTask] = useState("");
 
   useEffect(() => {
     //Rebuild columns every render
@@ -122,29 +124,28 @@ function Schedule(props) {
   }, [props.startDate, items]);
 
   useEffect(() => {
-
-    const _items = []
+    const _items = [];
 
     async function inside() {
       const querySnapshot = await getDocs(collection(db, "tasks"));
       querySnapshot.forEach((doc) => {
-        const currentTask = {}
-        console.log(doc.data().id)
-        currentTask.id = doc.data().id
-        currentTask.content = doc.data().content
-        currentTask.date = new Date(doc.data().date.seconds*1000) //need to get the date from Firestore's format into a proper date object
-        currentTask.project = doc.data().project
-        currentTask.percentComplete = doc.data().percentComplete
-        _items.push(currentTask)
+        const currentTask = {};
+        console.log(doc.data().id);
+        currentTask.id = doc.data().id;
+        currentTask.content = doc.data().content;
+        currentTask.date = new Date(doc.data().date.seconds * 1000); //need to get the date from Firestore's format into a proper date object
+        currentTask.project = doc.data().project;
+        currentTask.percentComplete = doc.data().percentComplete;
+        _items.push(currentTask);
       });
     }
-    console.log('before')
+    console.log("before");
     inside().then(() => {
-      console.log('after')
-      console.log(_items)
-      setItems(_items)
+      console.log("after");
+      console.log(_items);
+      setItems(_items);
     });
-  },[]);
+  }, []);
 
   const onChangeContent = (event) => {
     setNewContent(event.target.value);
@@ -173,8 +174,6 @@ function Schedule(props) {
 
     setItems(_items);
     async function writeData() {
-      
-
       //if you want an auto generated id
       //const docRef = await addDoc(collection(db, "tasks"), docData);
       //console.log("Document written with ID: ", docRef.id);
@@ -186,8 +185,36 @@ function Schedule(props) {
     writeData();
   }
 
+  const changeCurrentTask = (currentTask) => {
+    //console.log(currentTask)
+    setCurrentTask(currentTask);
+  };
+
+  function finishEdit(content, date) {
+    alert("All done!");
+    const _items = [...items];
+
+    _items.forEach((item) => {
+      if (item.id === currentTask) {
+        alert("Another message");
+        item.content = content;
+        item.date = date;
+      }
+    });
+
+    setItems(_items);
+    setCurrentTask("");
+  }
+
   return (
-    <div style={{ display: "flex", justifyContent: "center", height: "100%" }}>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        height: "100%",
+        border: "1px solid black",
+      }}
+    >
       <div
         className="controlPanel"
         style={{
@@ -225,7 +252,15 @@ function Schedule(props) {
             Add
           </button>
         </div>
-        <TaskList items={items} />
+        {currentTask === "" ? (
+          <TaskList items={items} changeCurrentTask={changeCurrentTask} />
+        ) : (
+          <EditTask
+            tasks={items}
+            currentTask={currentTask}
+            finishEdit={finishEdit}
+          />
+        )}
       </div>
       <DragDropContext
         onDragEnd={(result) =>
@@ -260,7 +295,7 @@ function Schedule(props) {
                             ? "orange"
                             : "lightgrey",
                           padding: 4,
-                          width: 250,
+                          width: 270,
                           minHeight: 500,
                           borderRadius: "1rem",
                           boxShadow: ".8rem .8rem .8rem .2rem #364E8E",

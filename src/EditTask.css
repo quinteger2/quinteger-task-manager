@@ -1,4 +1,4 @@
-.addWidget {
+.EditTask {
     display: flex;
     flex-direction: column;
     border-radius: 1rem;
@@ -6,14 +6,15 @@
     padding: 1rem .5rem;
     margin: .5rem 0;
     width: 270px;
-    
-  }
-
-.addWidget input {
-    font-size: 1rem;
 }
 
-.addWidget button {
+.EditTask input {
+  width: 240px;
+  margin: 0 0.2em;
+  font-size: 1rem;
+}
+
+.EditTask button {
     width: 180px;
     font-size: 1rem;
 }

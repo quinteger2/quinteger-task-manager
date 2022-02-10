@@ -25,9 +25,17 @@ button {
   border-radius: 5rem;
 }
 
-.DatePickerExample {
+.ChangeDisplayDate {
+  margin: .5rem 0;
+  border: 1px solid black;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+  width: 1481px;
+  padding: .5rem 1.5rem;
+}
+
+.ChangeDisplayDate button {
+  width: 250px;
 }
 
 .appTitle {

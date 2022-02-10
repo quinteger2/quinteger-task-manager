@@ -1,28 +1,7 @@
 import "./App.css";
 import Schedule from "./Schedule.js";
 import React, { useEffect, useState } from "react";
-
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-// CSS Modules, react-datepicker-cssmodules.css
-// import 'react-datepicker/dist/react-datepicker-cssmodules.css';
-import db from "./firebase";
-
-const DatePickerExample = (props) => {
-  const [_date, setDate] = useState(new Date(props.startDate));
-
-  return (
-    <div className="DatePickerExample">
-      <DatePicker
-        selected={_date}
-        onChange={(date) => {
-          setDate(date.setHours(0, 0, 0, 0));
-        }}
-      />
-      <button onClick={() => props.changeDate(_date)}>Change Date</button>
-    </div>
-  );
-};
+import ChangeDate from './ChangeDate.js'
 
 const ScheduleAndDatePicker = () => {
   const [startDate, setStartDate] = useState(
@@ -35,7 +14,7 @@ const ScheduleAndDatePicker = () => {
   }
   return (
     <>
-      <DatePickerExample startDate={startDate} changeDate={changeDate} />
+      <ChangeDate startDate={startDate} changeDate={changeDate} />
       <Schedule startDate={startDate} />
     </>
   );
