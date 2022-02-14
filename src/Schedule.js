@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
-import { itemsFromBackend } from "./data.js";
-import { v4 as uuid } from "uuid";
 import TaskList from "./TaskList.js";
 import "./Schedule.css";
 import Task from "./Task.js";
@@ -18,6 +16,7 @@ import {
 } from "firebase/firestore";
 import db from "./firebase";
 import EditTask from "./EditTask.js";
+import AddTask from "./components/AddTask.js";
 
 const onDragEnd = (result, columns, setColumns, items, setItems) => {
   if (!result.destination) return;
@@ -79,9 +78,6 @@ const onDragEnd = (result, columns, setColumns, items, setItems) => {
 
 function Schedule(props) {
   const [items, setItems] = useState([]);
-  const [newContent, setNewContent] = useState("");
-  const [newTaskDate, setNewTaskDate] = useState("");
-  const [newProject, setNewProject] = useState("No Project");
   const [columns, setColumns] = useState({});
   const [currentTask, setCurrentTask] = useState("");
 
@@ -129,76 +125,38 @@ function Schedule(props) {
     async function inside() {
       const querySnapshot = await getDocs(collection(db, "tasks"));
       querySnapshot.forEach((doc) => {
+
         const currentTask = {};
-        console.log(doc.data().id);
+        
         currentTask.id = doc.data().id;
         currentTask.content = doc.data().content;
         currentTask.date = new Date(doc.data().date.seconds * 1000); //need to get the date from Firestore's format into a proper date object
-        currentTask.project = doc.data().project;
+        currentTask.group = doc.data().group;
+        currentTask.person = doc.data().person;
         currentTask.percentComplete = doc.data().percentComplete;
         _items.push(currentTask);
       });
     }
-    console.log("before");
     inside().then(() => {
-      console.log("after");
-      console.log(_items);
       setItems(_items);
     });
   }, []);
-
-  const onChangeContent = (event) => {
-    setNewContent(event.target.value);
-  };
-
-  const onChangeTaskDate = (event) => {
-    setNewTaskDate(event.target.value);
-  };
-
-  const onChangeProject = (event) => {
-    setNewProject(event.target.value);
-  };
-
-  function handleAdd() {
-    const _items = [...items];
-
-    const newTask = {
-      id: uuid(),
-      content: newContent,
-      date: new Date(newTaskDate),
-      project: newProject,
-      percentComplete: 0,
-    };
-
-    _items.push(newTask);
-
-    setItems(_items);
-    async function writeData() {
-      //if you want an auto generated id
-      //const docRef = await addDoc(collection(db, "tasks"), docData);
-      //console.log("Document written with ID: ", docRef.id);
-
-      //If you want to set the id yourself
-      await setDoc(doc(db, "tasks", newTask.id), newTask);
-    }
-
-    writeData();
-  }
 
   const changeCurrentTask = (currentTask) => {
     //console.log(currentTask)
     setCurrentTask(currentTask);
   };
 
-  function finishEdit(content, date) {
-    alert("All done!");
+  function changeLocalItems(content, date, group, person, percentComplete) {
     const _items = [...items];
 
     _items.forEach((item) => {
       if (item.id === currentTask) {
-        alert("Another message");
         item.content = content;
         item.date = date;
+        item.group = group;
+        item.person = person;
+        item.percentComplete = percentComplete;
       }
     });
 
@@ -225,40 +183,14 @@ function Schedule(props) {
         }}
       >
         <h2>Manage Tasks</h2>
-        <div className="addWidget">
-          <h3>Add Task</h3>
-          <input
-            type="text"
-            className="newContent"
-            value={newContent}
-            onChange={onChangeContent}
-            placeholder="New Task's Content"
-          />
-          <input
-            type="text"
-            className="newTaskDate"
-            value={newTaskDate}
-            onChange={onChangeTaskDate}
-            placeholder="New Task's Date"
-          />
-          <input
-            type="text"
-            className="newTaskDate"
-            value={newProject}
-            onChange={onChangeProject}
-            placeholder="New Task's Project"
-          />
-          <button className="add" onClick={handleAdd}>
-            Add
-          </button>
-        </div>
+        <AddTask items={items} setItems={setItems} />
         {currentTask === "" ? (
           <TaskList items={items} changeCurrentTask={changeCurrentTask} />
         ) : (
           <EditTask
             tasks={items}
             currentTask={currentTask}
-            finishEdit={finishEdit}
+            changeLocalItems={changeLocalItems}
           />
         )}
       </div>
@@ -295,7 +227,7 @@ function Schedule(props) {
                             ? "orange"
                             : "lightgrey",
                           padding: 4,
-                          width: 270,
+                          width: "16vw",
                           minHeight: 500,
                           borderRadius: "1rem",
                           boxShadow: ".8rem .8rem .8rem .2rem #364E8E",

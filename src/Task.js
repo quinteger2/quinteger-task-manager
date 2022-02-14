@@ -1,7 +1,7 @@
 import React from "react";
 
 export default function Task(props) {
-  console.log(props.task);
+  
   if (props.task.date !== undefined)
     return (
       <>

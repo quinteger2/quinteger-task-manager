@@ -2,22 +2,38 @@ import React, { useEffect, useState } from "react";
 import "./EditTask.css";
 import db from "./firebase";
 import { updateDoc, doc } from "firebase/firestore";
-import ChangeDate from "./ChangeDate.js";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+// CSS Modules, react-datepicker-cssmodules.css
+// import 'react-datepicker/dist/react-datepicker-cssmodules.css';
 
 export default function EditTask(props) {
   const [content, setContent] = useState("");
-  const [date, setDate] = useState(new Date());
+  const [newTaskDate, setNewTaskDate] = useState("");
   const [group, setGroup] = useState("");
   const [person, setPerson] = useState("");
+  const [percentComplete, setPercentComplete] = useState("");
 
   const [oldTask, setOldTask] = useState({});
 
-  async function updateTask(ref, newContent, newDate) {
-    console.log(ref);
+  async function updateTask(
+    ref,
+    _content,
+    _date,
+    _group,
+    _person,
+    _percentComplete
+  ) {
+
+    console.log(`Percent Complete: ${percentComplete}`)
+
     try {
       await updateDoc(ref, {
-        content: newContent,
-        date: newDate,
+        content: _content,
+        date: new Date(_date),
+        group: _group,
+        person: _person,
+        percentComplete: _percentComplete,
       });
     } catch (e) {
       console.log("Error updating:", e);
@@ -28,43 +44,95 @@ export default function EditTask(props) {
     setContent(event.target.value);
   };
 
+  const onChangeGroup = (event) => {
+    setGroup(event.target.value);
+  };
+
+  const onChangePerson = (event) => {
+    setPerson(event.target.value);
+  };
+
+  const onChangePercentComplete = (event) => {
+    setPercentComplete(event.target.value);
+  };
+
+  const onChangeTaskDate = (event) => {
+    setNewTaskDate(event.target.value);
+  };
+
   const handleSave = (event) => {
     const ref = doc(db, "tasks", oldTask.id);
-    updateTask(ref, content, date);
-    props.finishEdit(content, date)
+    updateTask(ref, content, newTaskDate, group, person, percentComplete);
+    props.changeLocalItems(content, new Date(newTaskDate), group, person, percentComplete);
   };
 
   useEffect(() => {
     props.tasks.forEach((item) => {
       if (item.id === props.currentTask) {
-        console.log("Over here!");
         setOldTask(item);
         setContent(item.content);
-        setDate(item.date);
-        console.log(item);
+        setNewTaskDate(new Date(item.date));
+        setGroup(item.group);
+        setPerson(item.person);
+        setPercentComplete(item.percentComplete)
       }
     });
-  }, []);
+  }, [props.tasks, props.currentTask]);
 
-  function changeDate(props) {
-    //console.log(new Date(props).toLocaleDateString('en-US'))
-    setDate(props);
-  }
+  //console.log(date);
 
   return (
     <div className="EditTask">
-      <h3>Task Description:</h3>
-      <input
-        type="text"
-        className="newContent"
-        value={content}
-        onChange={onChangeContent}
-      />
-      <h3>Task Date:</h3>
-      <ChangeDate startDate={date} changeDate={changeDate} />
-      <button className="add" onClick={handleSave}>
-        Save
-      </button>
+      <div className="inputGroup">
+        <p>Task Description:</p>
+        <input
+          type="text"
+          className="newContent"
+          value={content}
+          onChange={onChangeContent}
+        />
+      </div>
+      <div className="inputGroup">
+        <p>Group</p>
+        <input
+          type="text"
+          className="newGroup"
+          value={group}
+          onChange={onChangeGroup}
+        />
+      </div>
+      <div className="inputGroup">
+        <p>Percent Complete</p>
+        <input
+          type="text"
+          className="newPercentComplete"
+          value={percentComplete}
+          onChange={onChangePercentComplete}
+        />
+      </div>
+      <div className="inputGroup">
+        <p>Person</p>
+        <input
+          type="text"
+          className="newPerson"
+          value={person}
+          onChange={onChangePerson}
+        />
+      </div>
+      <div className="inputGroup">
+        <input
+          type="text"
+          className="newTaskDate"
+          value={newTaskDate}
+          onChange={onChangeTaskDate}
+          placeholder="New Task's Date"
+        />
+      </div>
+      <div className="inputGroup">
+        <button className="add" onClick={handleSave}>
+          Save
+        </button>
+      </div>
     </div>
   );
 }

@@ -30,7 +30,7 @@ button {
   border: 1px solid black;
   display: flex;
   flex-direction: column;
-  width: 1481px;
+  width: 90vw;
   padding: .5rem 1.5rem;
 }
 

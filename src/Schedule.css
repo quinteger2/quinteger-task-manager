@@ -5,7 +5,7 @@
     border: 2px solid black;
     padding: 1rem .5rem;
     margin: .5rem 0;
-    width: 270px;
+    width: 16vw;
     
   }
 
@@ -14,6 +14,6 @@
 }
 
 .addWidget button {
-    width: 180px;
+    width: 16vw;
     font-size: 1rem;
 }

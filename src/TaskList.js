@@ -3,12 +3,12 @@ import "./TaskList.css";
 
 function TaskListItem(props) {
   return (
-    <>
+    <div className="TaskListItem">
       <p >{`${props.item.content} (${props.item.date.toLocaleDateString()}, ${
         props.item.percentComplete
       }%)`}</p>
       <button onClick={() => props.changeCurrentTask(props.item.id)}>Edit</button>
-    </>
+    </div>
   );
 }
 
