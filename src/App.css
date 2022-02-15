@@ -40,9 +40,14 @@ button {
 
 .appTitle {
   margin: 0 auto;
-  width: 20rem;
+  width: 30rem;
   border-radius: 0.5rem;
   box-shadow: 0rem 0.8rem 0.8rem 0.2rem hsl(256, 65%, 54%);
   padding: 0.5rem;
   border: 0.1rem solid black;
+}
+
+.appTitle h1 {
+  margin: 0 auto;
+  width: 21rem;
 }

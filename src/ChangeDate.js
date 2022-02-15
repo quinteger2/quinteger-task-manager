@@ -8,14 +8,14 @@ export default function ChangeDate(props) {
   const [_date, setDate] = useState(new Date(props.startDate));
 
   return (
-    <div className="ChangeDate">
+    <div className="ChangeDate" style={{width: "12em"}}>
       <DatePicker
         selected={_date}
         onChange={(date) => {
           setDate(date.setHours(0, 0, 0, 0));
         }}
       />
-      <button onClick={() => props.changeDate(_date)}>Change Date</button>
+      <button onClick={() => props.changeDate(_date)} style={{width: "10em"}}>Change Date</button>
     </div>
   );
 }

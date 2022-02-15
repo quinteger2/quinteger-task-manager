@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function Task(props) {
+export default function CalendarTask(props) {
   
   if (props.task.date !== undefined)
     return (
@@ -15,7 +15,8 @@ export default function Task(props) {
         >
           {" "}
           <p style={{fontWeight:"bold"}}>{props.task.content}</p>
-          <p style={{fontWeight:"bold"}}>{props.task.date.toLocaleDateString("en-US")}</p>
+          <p >{props.task.date.toLocaleDateString("en-US")}</p>
+          <p >{props.task.person}</p>
         </div>
       </>
     );

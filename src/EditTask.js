@@ -25,8 +25,6 @@ export default function EditTask(props) {
     _percentComplete
   ) {
 
-    console.log(`Percent Complete: ${percentComplete}`)
-
     try {
       await updateDoc(ref, {
         content: _content,
@@ -62,8 +60,17 @@ export default function EditTask(props) {
 
   const handleSave = (event) => {
     const ref = doc(db, "tasks", oldTask.id);
+    const newDate = new Date(newTaskDate.replace(/-/g,'/').replace('T',' ')); //need to reformat HTML date object's string to be kinder to JS
+
+    
     updateTask(ref, content, newTaskDate, group, person, percentComplete);
-    props.changeLocalItems(content, new Date(newTaskDate), group, person, percentComplete);
+    props.changeLocalItems(
+      content,
+      newDate,
+      group,
+      person,
+      percentComplete
+    );
   };
 
   useEffect(() => {
@@ -74,7 +81,7 @@ export default function EditTask(props) {
         setNewTaskDate(new Date(item.date));
         setGroup(item.group);
         setPerson(item.person);
-        setPercentComplete(item.percentComplete)
+        setPercentComplete(item.percentComplete);
       }
     });
   }, [props.tasks, props.currentTask]);
@@ -121,11 +128,10 @@ export default function EditTask(props) {
       </div>
       <div className="inputGroup">
         <input
-          type="text"
+          type="date"
           className="newTaskDate"
           value={newTaskDate}
           onChange={onChangeTaskDate}
-          placeholder="New Task's Date"
         />
       </div>
       <div className="inputGroup">

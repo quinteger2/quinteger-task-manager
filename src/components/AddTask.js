@@ -9,9 +9,9 @@ import db from "../firebase";
 export default function AddTask(props) {
 
   const [newContent, setNewContent] = useState("");
-  const [newTaskDate, setNewTaskDate] = useState("");
+  const [newTaskDate, setNewTaskDate] = useState(new Date());
   const [newGroup, setNewGroup] = useState("No Group");
-  const [newPerson, setNewPerson] = useState("");
+  const [newPerson, setNewPerson] = useState("Unassigned");
 
   const onChangeContent = (event) => {
     setNewContent(event.target.value);
@@ -35,7 +35,7 @@ export default function AddTask(props) {
     const newTask = {
       id: uuid(),
       content: newContent,
-      date: new Date(newTaskDate),
+      date: new Date(newTaskDate.replace(/-/g,'/').replace('T',' ')), //need to reformat HTML date object's string to be kinder to JS
       group: newGroup,
       person: newPerson,
       percentComplete: 0,
@@ -67,7 +67,7 @@ export default function AddTask(props) {
         placeholder="New Task's Content"
       />
       <input
-        type="text"
+        type="date"
         className="newTaskDate"
         value={newTaskDate}
         onChange={onChangeTaskDate}

@@ -1,17 +1,16 @@
-.TaskList {
-    border-radius: 1em;
-    border: 2px solid black;
-    padding: 1rem .5rem;
-    margin: .5rem 0;
-    width: 16vw;
-  }
+
 
   .TaskList button {
-    width: 14vw;
+    width: 3em;
+    height: 2em;
     font-size: .8em;
   }
 
   .TaskListItem {
     border-top: 1px black solid;
     padding: .2em;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
   }

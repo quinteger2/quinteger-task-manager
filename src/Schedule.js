@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
-import TaskList from "./TaskList.js";
+import Tasks from "./Tasks.js";
 import "./Schedule.css";
-import Task from "./Task.js";
+import CalendarTask from "./CalendarTask.js";
 import {
   getDocs,
   onSnapshot,
@@ -102,7 +102,10 @@ function Schedule(props) {
       //Loop through the columns to find the appropriate one for this item
       newColumns.forEach((column) => {
         if (task.date !== undefined) {
+          //console.log(task.date.getTime());
+          //console.log(column[0]);
           if (column[0] === task.date.getTime()) {
+            // console.log(task.date.getTime());
             column[1].items.push(task);
           }
         }
@@ -116,6 +119,7 @@ function Schedule(props) {
       result[obj[0]] = obj[1];
     });
 
+    //console.log(result)
     setColumns(result);
   }, [props.startDate, items]);
 
@@ -125,9 +129,8 @@ function Schedule(props) {
     async function inside() {
       const querySnapshot = await getDocs(collection(db, "tasks"));
       querySnapshot.forEach((doc) => {
-
         const currentTask = {};
-        
+
         currentTask.id = doc.data().id;
         currentTask.content = doc.data().content;
         currentTask.date = new Date(doc.data().date.seconds * 1000); //need to get the date from Firestore's format into a proper date object
@@ -139,6 +142,7 @@ function Schedule(props) {
     }
     inside().then(() => {
       setItems(_items);
+      //console.log(_items)
     });
   }, []);
 
@@ -185,7 +189,11 @@ function Schedule(props) {
         <h2>Manage Tasks</h2>
         <AddTask items={items} setItems={setItems} />
         {currentTask === "" ? (
-          <TaskList items={items} changeCurrentTask={changeCurrentTask} />
+          <Tasks
+            items={items}
+            changeCurrentTask={changeCurrentTask}
+            sortBy="content"
+          />
         ) : (
           <EditTask
             tasks={items}
@@ -248,9 +256,9 @@ function Schedule(props) {
                                     {...provided.dragHandleProps}
                                     style={{
                                       userSelect: "none",
-                                      padding: 16,
-                                      margin: "0 0 8px 0",
-                                      minHeight: "50px",
+                                      padding: ".5rem",
+                                      margin: ".25rem",
+                                      minHeight: "2rem",
                                       backgroundColor: snapshot.isDragging
                                         ? "#263B4A"
                                         : "#456C86",
@@ -259,7 +267,7 @@ function Schedule(props) {
                                       borderRadius: "1rem",
                                     }}
                                   >
-                                    <Task task={item} />
+                                    <CalendarTask task={item} />
                                   </div>
                                 );
                               }}
