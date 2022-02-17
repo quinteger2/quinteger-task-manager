@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./EditTask.css";
-import db from "./firebase";
+import db from "../firebase";
 import { updateDoc, doc } from "firebase/firestore";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-// CSS Modules, react-datepicker-cssmodules.css
-// import 'react-datepicker/dist/react-datepicker-cssmodules.css';
 
 export default function EditTask(props) {
   const [content, setContent] = useState("");
@@ -24,7 +20,6 @@ export default function EditTask(props) {
     _person,
     _percentComplete
   ) {
-
     try {
       await updateDoc(ref, {
         content: _content,
@@ -32,9 +27,9 @@ export default function EditTask(props) {
         group: _group,
         person: _person,
         percentComplete: _percentComplete,
-      });
+      }).then(props.changeWriteState("success"));
     } catch (e) {
-      console.log("Error updating:", e);
+      props.changeWriteState("error");
     }
   }
 
@@ -55,18 +50,20 @@ export default function EditTask(props) {
   };
 
   const onChangeTaskDate = (event) => {
+    //console.log(newTaskDate);
     setNewTaskDate(event.target.value);
   };
 
   const handleSave = (event) => {
     const ref = doc(db, "tasks", oldTask.id);
-    const newDate = new Date(newTaskDate.replace(/-/g,'/').replace('T',' ')); //need to reformat HTML date object's string to be kinder to JS
 
-    
+    //console.log(newTaskDate);
+    //const newDate = new Date(newTaskDate.replace(/-/g,'/').replace('T',' ')); //need to reformat HTML date object's string to be kinder to JS
+
     updateTask(ref, content, newTaskDate, group, person, percentComplete);
     props.changeLocalItems(
       content,
-      newDate,
+      new Date(newTaskDate),
       group,
       person,
       percentComplete
@@ -84,9 +81,8 @@ export default function EditTask(props) {
         setPercentComplete(item.percentComplete);
       }
     });
+    //console.log(setNewTaskDate);
   }, [props.tasks, props.currentTask]);
-
-  //console.log(date);
 
   return (
     <div className="EditTask">
@@ -128,14 +124,14 @@ export default function EditTask(props) {
       </div>
       <div className="inputGroup">
         <input
-          type="date"
+          type="text"
           className="newTaskDate"
           value={newTaskDate}
           onChange={onChangeTaskDate}
         />
       </div>
       <div className="inputGroup">
-        <button className="add" onClick={handleSave}>
+        <button className="Save" onClick={handleSave}>
           Save
         </button>
       </div>

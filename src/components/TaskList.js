@@ -15,33 +15,47 @@ function TaskListItem(props) {
 }
 
 export default function TaskList(props) {
-  var _items = [];
+  var sortedItems = [];
 
   switch (props.sortBy) {
     case "content":
-      _items = props.items.sort((a, b) => {
+      sortedItems = props.items.sort((a, b) => {
         return a.content.toLowerCase() > b.content.toLowerCase();
       });
       break;
     case "date":
-      _items = props.items.sort((a, b) => {
+      sortedItems = props.items.sort((a, b) => {
         return a.date > b.date;
       });
       break;
     case "percent":
-      _items = props.items.sort((a, b) => {
+      sortedItems = props.items.sort((a, b) => {
         return a.percentComplete > b.percentComplete;
       });
       break;
     case "person":
-      _items = props.items.sort((a, b) => {
+      sortedItems = props.items.sort((a, b) => {
         return a.person.toLowerCase() > b.person.toLowerCase();
       });
+      break;
     default:
-      _items = props.items;
+      sortedItems = props.items;
   }
 
-  const final_product = _items.map((item) => (
+  var filteredItems = [];
+
+  switch (props.filter) {
+    case "currentPeriod":
+      filteredItems = sortedItems.filter(
+        (item) => item.date >= props.startDate && item.date <= props.endingDate
+      );
+      console.log(new Date(props.startDate) + " " + new Date(props.endingDate));
+      break;
+    default:
+      filteredItems = sortedItems;
+  }
+
+  const final_product = filteredItems.map((item) => (
     <TaskListItem
       key={item.id}
       changeCurrentTask={props.changeCurrentTask}

@@ -9,11 +9,11 @@ export default function CalendarTask(props) {
         className="progressBar"
           style={{
             width: `${props.task.percentComplete}%`,
-            backgroundColor: "red",
+            background: "linear-gradient(90deg, black 0%, #456C86 100%)",
+            borderRadius: ".6rem",
             margin: 0
           }}
         >
-          {" "}
           <p style={{fontWeight:"bold"}}>{props.task.content}</p>
           <p >{props.task.date.toLocaleDateString("en-US")}</p>
           <p >{props.task.person}</p>

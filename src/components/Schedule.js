@@ -14,9 +14,9 @@ import {
   Timestamp,
   docRef,
 } from "firebase/firestore";
-import db from "./firebase";
+import db from "../firebase";
 import EditTask from "./EditTask.js";
-import AddTask from "./components/AddTask.js";
+import AddTask from "./AddTask.js";
 
 const onDragEnd = (result, columns, setColumns, items, setItems) => {
   if (!result.destination) return;
@@ -80,15 +80,16 @@ function Schedule(props) {
   const [items, setItems] = useState([]);
   const [columns, setColumns] = useState({});
   const [currentTask, setCurrentTask] = useState("");
+  const [editWriteState, setEditWriteState] = useState("");
+  const dayInMilliseconds = 24 * 60 * 60 * 1000;
 
   useEffect(() => {
     //Rebuild columns every render
     const newColumns = [];
     var i = 0;
 
-    const dayInMilliseconds = 24 * 60 * 60 * 1000;
 
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < 5; i++) {
       newColumns.push([
         props.startDate + dayInMilliseconds * i,
         {
@@ -102,10 +103,7 @@ function Schedule(props) {
       //Loop through the columns to find the appropriate one for this item
       newColumns.forEach((column) => {
         if (task.date !== undefined) {
-          //console.log(task.date.getTime());
-          //console.log(column[0]);
           if (column[0] === task.date.getTime()) {
-            // console.log(task.date.getTime());
             column[1].items.push(task);
           }
         }
@@ -142,13 +140,21 @@ function Schedule(props) {
     }
     inside().then(() => {
       setItems(_items);
-      //console.log(_items)
     });
   }, []);
 
+  useEffect(() => {}, []);
+
   const changeCurrentTask = (currentTask) => {
-    //console.log(currentTask)
     setCurrentTask(currentTask);
+  };
+
+  const changeeditWriteState = (editWriteState) => {
+    setEditWriteState(editWriteState);
+    const timer = setTimeout(() => {
+      //console.log("Clearing out success color!");
+      setEditWriteState("");
+    }, 3000);
   };
 
   function changeLocalItems(content, date, group, person, percentComplete) {
@@ -191,14 +197,18 @@ function Schedule(props) {
         {currentTask === "" ? (
           <Tasks
             items={items}
-            changeCurrentTask={changeCurrentTask}
             sortBy="content"
+            changeCurrentTask={changeCurrentTask}
+            writeState={editWriteState}
+            startDate={props.startDate}
+            endingDate={props.startDate + dayInMilliseconds * 4}
           />
         ) : (
           <EditTask
             tasks={items}
             currentTask={currentTask}
             changeLocalItems={changeLocalItems}
+            changeWriteState={changeeditWriteState}
           />
         )}
       </div>
@@ -235,7 +245,7 @@ function Schedule(props) {
                             ? "orange"
                             : "lightgrey",
                           padding: 4,
-                          width: "16vw",
+                          width: "12vw",
                           minHeight: 500,
                           borderRadius: "1rem",
                           boxShadow: ".8rem .8rem .8rem .2rem #364E8E",

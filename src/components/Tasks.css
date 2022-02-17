@@ -1,0 +1,15 @@
+.Tasks {
+  border-radius: 1em;
+  border: 2px solid black;
+  padding: 1rem 0.5rem;
+  margin: 0.5rem 0;
+  width: 12vw;
+}
+
+.success {
+  background-color: rgb(118, 175, 144);
+}
+
+.error {
+  background-color: red;
+}

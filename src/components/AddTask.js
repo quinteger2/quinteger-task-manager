@@ -87,7 +87,8 @@ export default function AddTask(props) {
         onChange={onChangePerson}
         placeholder="New Task's Person"
       />
-      <button className="add" onClick={handleAdd} style={{width: "15vw"}}>
+      <br/>
+      <button className="add" onClick={handleAdd} style={{width: "11vw"}}>
         Add
       </button>
     </div>
