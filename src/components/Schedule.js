@@ -14,7 +14,7 @@ import {
   Timestamp,
   docRef,
 } from "firebase/firestore";
-import db from "../firebase";
+import { db } from "../firebase";
 import EditTask from "./EditTask.js";
 import AddTask from "./AddTask.js";
 
@@ -88,7 +88,6 @@ function Schedule(props) {
     const newColumns = [];
     var i = 0;
 
-
     for (i = 0; i < 5; i++) {
       newColumns.push([
         props.startDate + dayInMilliseconds * i,
@@ -119,12 +118,12 @@ function Schedule(props) {
 
     //console.log(result)
     setColumns(result);
-  }, [props.startDate, items]);
+  }, [props.startDate, items, dayInMilliseconds]);
 
   useEffect(() => {
     const _items = [];
 
-    async function inside() {
+    async function getTasks() {
       const querySnapshot = await getDocs(collection(db, "tasks"));
       querySnapshot.forEach((doc) => {
         const currentTask = {};
@@ -138,7 +137,7 @@ function Schedule(props) {
         _items.push(currentTask);
       });
     }
-    inside().then(() => {
+    getTasks().then(() => {
       setItems(_items);
     });
   }, []);
@@ -151,7 +150,7 @@ function Schedule(props) {
 
   const changeeditWriteState = (editWriteState) => {
     setEditWriteState(editWriteState);
-    const timer = setTimeout(() => {
+    setTimeout(() => {
       //console.log("Clearing out success color!");
       setEditWriteState("");
     }, 3000);
@@ -193,7 +192,7 @@ function Schedule(props) {
         }}
       >
         <h2>Manage Tasks</h2>
-        <AddTask items={items} setItems={setItems} />
+        <AddTask items={items} setItems={setItems} addWidth="11vw" />
         {currentTask === "" ? (
           <Tasks
             items={items}
@@ -202,6 +201,7 @@ function Schedule(props) {
             writeState={editWriteState}
             startDate={props.startDate}
             endingDate={props.startDate + dayInMilliseconds * 4}
+            taskWidth="12vw"
           />
         ) : (
           <EditTask
@@ -209,6 +209,7 @@ function Schedule(props) {
             currentTask={currentTask}
             changeLocalItems={changeLocalItems}
             changeWriteState={changeeditWriteState}
+            editWidth="12vw"
           />
         )}
       </div>

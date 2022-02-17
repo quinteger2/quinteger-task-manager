@@ -4,9 +4,7 @@
     border-radius: 1rem;
     border: 2px solid black;
     padding: 1rem .5rem;
-    margin: .5rem 0;
-    width: 12vw;
-    
+    margin: .5rem 0;    
   }
 
 .addWidget input {
@@ -14,6 +12,5 @@
 }
 
 .addWidget button {
-    width: 12vw;
     font-size: 1rem;
 }

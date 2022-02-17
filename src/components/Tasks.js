@@ -3,6 +3,17 @@ import TaskList from "./TaskList";
 import "./Tasks.css";
 
 export default function Tasks(props) {
+
+  //Props required:
+  //writeState - indicates if a write (from EditTask) was successful or not. "" is acceptable if no write is recent
+  //items - array of tasks which comes from Firestore
+  //currentTask - id of the task to be edited
+  //changeLocalItems - function to change the local items array (stored separately from Firestore's list) to the passed in data for the currentTask
+  //changeCurrentTask - function to change the currentTask
+  //startDate - beginning of calendar range
+  //endingDate - end of calendar range
+
+
   const [sortBy, setSortBy] = useState("content");
   const [filter, setFilterBy] = useState("all");
   const sortOptions = [
@@ -51,7 +62,7 @@ export default function Tasks(props) {
   }
 
   return (
-    <div className={"Tasks " + props.writeState}>
+    <div className={"Tasks " + props.writeState} style={{width: props.taskWidth}}>
       <h3>Tasks</h3>
       <p>Sort By: </p>
       <div className="sortBy">

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./EditTask.css";
-import db from "../firebase";
+import { db } from "../firebase";
 import { updateDoc, doc } from "firebase/firestore";
 
 export default function EditTask(props) {
@@ -85,7 +85,7 @@ export default function EditTask(props) {
   }, [props.tasks, props.currentTask]);
 
   return (
-    <div className="EditTask">
+    <div className="EditTask" style={{width: props.editWidth}}>
       <div className="inputGroup">
         <p>Task Description:</p>
         <input

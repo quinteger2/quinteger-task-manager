@@ -5,17 +5,14 @@
   border: 2px solid black;
   padding: 1rem 0.5rem;
   margin: 0.5rem 0;
-  width: 12vw;
 }
 
 .EditTask input {
-  width: 11vw;
   margin: 0 0.2em;
   font-size: 1rem;
 }
 
 .EditTask button {
-  width: 11vw;
   font-size: 1rem;
 }
 

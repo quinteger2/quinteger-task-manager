@@ -1,13 +1,9 @@
 import React, { useState } from "react";
 import { v4 as uuid } from "uuid";
-import {
-  setDoc,
-  doc,
-} from "firebase/firestore";
-import db from "../firebase";
+import { setDoc, doc } from "firebase/firestore";
+import { db } from "../firebase";
 
 export default function AddTask(props) {
-
   const [newContent, setNewContent] = useState("");
   const [newTaskDate, setNewTaskDate] = useState(new Date());
   const [newGroup, setNewGroup] = useState("No Group");
@@ -35,7 +31,7 @@ export default function AddTask(props) {
     const newTask = {
       id: uuid(),
       content: newContent,
-      date: new Date(newTaskDate.replace(/-/g,'/').replace('T',' ')), //need to reformat HTML date object's string to be kinder to JS
+      date: new Date(newTaskDate.replace(/-/g, "/").replace("T", " ")), //need to reformat HTML date object's string to be kinder to JS
       group: newGroup,
       person: newPerson,
       percentComplete: 0,
@@ -57,7 +53,7 @@ export default function AddTask(props) {
   }
 
   return (
-    <div className="addWidget">
+    <div className="addWidget" style={{ width: props.addWidth }}>
       <h3>Add Task</h3>
       <input
         type="text"
@@ -87,8 +83,11 @@ export default function AddTask(props) {
         onChange={onChangePerson}
         placeholder="New Task's Person"
       />
-      <br/>
-      <button className="add" onClick={handleAdd} style={{width: "11vw"}}>
+      <br />
+      <button
+        className="add"
+        onClick={handleAdd}
+      >
         Add
       </button>
     </div>
