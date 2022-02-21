@@ -3,24 +3,18 @@ import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import Tasks from "./Tasks.js";
 import "./Schedule.css";
 import CalendarTask from "./CalendarTask.js";
-import {
-  getDocs,
-  onSnapshot,
-  collection,
-  addDoc,
-  setDoc,
-  updateDoc,
-  doc,
-  Timestamp,
-  docRef,
-} from "firebase/firestore";
-import { db } from "../firebase";
+import { getTasks, updateDate } from "../firebase";
 import EditTask from "./EditTask.js";
 import AddTask from "./AddTask.js";
 
-const onDragEnd = (result, columns, setColumns, items, setItems) => {
+const onDragEnd = (result, columns, setColumns, items, currentTask, setCurrentTask) => {
   if (!result.destination) return;
   const { source, destination } = result;
+
+  if(currentTask !== "") {
+    //alert("I have to close Edit Task, so that it doesn't conflict with the schedule change you are making")
+    setCurrentTask("")
+  }
 
   if (source.droppableId !== destination.droppableId) {
     const sourceColumn = columns[source.droppableId];
@@ -45,19 +39,12 @@ const onDragEnd = (result, columns, setColumns, items, setItems) => {
 
     const _items = [...items];
 
-    async function updateDate(ref, newDate) {
-      await updateDoc(ref, {
-        date: newDate,
-      });
-    }
-
     _items.forEach((task) => {
       var changedTask = task;
       destItems.forEach((columnItem) => {
         if (task.id === columnItem.id) {
           changedTask.date = new Date(parseInt(destination.droppableId, 10));
-          const ref = doc(db, "tasks", task.id);
-          updateDate(ref, new Date(parseInt(destination.droppableId, 10)));
+          updateDate(task.id, new Date(parseInt(destination.droppableId, 10)));
         }
       });
     });
@@ -122,22 +109,7 @@ function Schedule(props) {
 
   useEffect(() => {
     const _items = [];
-
-    async function getTasks() {
-      const querySnapshot = await getDocs(collection(db, "tasks"));
-      querySnapshot.forEach((doc) => {
-        const currentTask = {};
-
-        currentTask.id = doc.data().id;
-        currentTask.content = doc.data().content;
-        currentTask.date = new Date(doc.data().date.seconds * 1000); //need to get the date from Firestore's format into a proper date object
-        currentTask.group = doc.data().group;
-        currentTask.person = doc.data().person;
-        currentTask.percentComplete = doc.data().percentComplete;
-        _items.push(currentTask);
-      });
-    }
-    getTasks().then(() => {
+    getTasks(_items).then(() => {
       setItems(_items);
     });
   }, []);
@@ -148,7 +120,7 @@ function Schedule(props) {
     setCurrentTask(currentTask);
   };
 
-  const changeeditWriteState = (editWriteState) => {
+  const changeEditWriteState = (editWriteState) => {
     setEditWriteState(editWriteState);
     setTimeout(() => {
       //console.log("Clearing out success color!");
@@ -192,7 +164,7 @@ function Schedule(props) {
         }}
       >
         <h2>Manage Tasks</h2>
-        <AddTask items={items} setItems={setItems} addWidth="11vw" />
+        <AddTask items={items} setItems={setItems} addWidth="12vw" />
         {currentTask === "" ? (
           <Tasks
             items={items}
@@ -208,14 +180,14 @@ function Schedule(props) {
             tasks={items}
             currentTask={currentTask}
             changeLocalItems={changeLocalItems}
-            changeWriteState={changeeditWriteState}
+            changeWriteState={changeEditWriteState}
             editWidth="12vw"
           />
         )}
       </div>
       <DragDropContext
         onDragEnd={(result) =>
-          onDragEnd(result, columns, setColumns, items, setItems)
+          onDragEnd(result, columns, setColumns, items, currentTask, setCurrentTask)
         }
       >
         {Object.entries(columns).map(([columnId, column], index) => {

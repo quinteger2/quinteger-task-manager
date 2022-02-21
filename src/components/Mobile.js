@@ -1,21 +1,9 @@
-import {
-  getDocs,
-  onSnapshot,
-  collection,
-  addDoc,
-  setDoc,
-  updateDoc,
-  doc,
-  Timestamp,
-  docRef,
-} from "firebase/firestore";
-import { db } from "../firebase";
+import { getTasks } from "../firebase";
 import EditTask from "./EditTask";
 import AddTask from "./AddTask";
 import Tasks from "./Tasks";
 import React, { useEffect, useState, useContext } from "react";
 import { AppContext } from "../AppContext";
-
 
 export default function Mobile() {
   //writeState - indicates if a write (from EditTask) was successful or not. "" is acceptable if no write is recent
@@ -28,12 +16,14 @@ export default function Mobile() {
 
   const dayInMilliseconds = 24 * 60 * 60 * 1000;
   const numberOfDaysToOffset = 4;
+  const context = useContext(AppContext);
+
+  const { items, setItems } = context;
 
   console.log(
     new Date(new Date().getTime() + numberOfDaysToOffset * dayInMilliseconds)
   );
 
-  const [items, setItems] = useState([]);
   const [currentTask, setCurrentTask] = useState("");
   const [_startDate, setLocalStartDate] = useState(new Date());
   const [_endingDate, setLocalEndingDate] = useState(
@@ -67,39 +57,26 @@ export default function Mobile() {
 
   useEffect(() => {
     const _items = [];
-
-    async function inside() {
-      const querySnapshot = await getDocs(collection(db, "tasks"));
-      querySnapshot.forEach((doc) => {
-        const currentTask = {};
-
-        currentTask.id = doc.data().id;
-        currentTask.content = doc.data().content;
-        currentTask.date = new Date(doc.data().date.seconds * 1000); //need to get the date from Firestore's format into a proper date object
-        currentTask.group = doc.data().group;
-        currentTask.person = doc.data().person;
-        currentTask.percentComplete = doc.data().percentComplete;
-        _items.push(currentTask);
-      });
-    }
-    inside().then(() => {
+    getTasks(_items).then(() => {
       setItems(_items);
     });
-  }, []);
+  }, [setItems]);
 
-  const context = useContext(AppContext)
   return (
     <>
-    {JSON.stringify(context)}
       {currentTask === "" ? (
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <div className="inputGroup">
+        <div>
+          <div
+            className="inputGroup"
+            style={{ display: "flex", flexDirection: "column" }}
+          >
             Start Date
             <input
               type="text"
               className="startDate"
               value={_startDate}
               onChange={(event) => setLocalStartDate(event.target.value)}
+              style={{ fontSize: "1rem" }}
             />
             Ending Date
             <input
@@ -107,6 +84,7 @@ export default function Mobile() {
               className="endingDate"
               value={_endingDate}
               onChange={(event) => setLocalEndingDate(event.target.value)}
+              style={{ fontSize: "1rem" }}
             />
             <button
               onClick={() => {

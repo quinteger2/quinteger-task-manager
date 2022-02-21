@@ -19,7 +19,8 @@ function App() {
        We only want the listener to be added once */
   }, []);
 
-  const initialContext = {hello: "world"}
+  const [items, setItems] = React.useState([]);
+  const initialContext = {items, setItems}
 
   return (
     <div className="App">

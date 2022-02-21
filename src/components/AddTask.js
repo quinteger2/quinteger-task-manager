@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { v4 as uuid } from "uuid";
-import { setDoc, doc } from "firebase/firestore";
-import { db } from "../firebase";
+import { writeData } from "../firebase";
 
 export default function AddTask(props) {
   const [newContent, setNewContent] = useState("");
@@ -26,30 +25,35 @@ export default function AddTask(props) {
   };
 
   function handleAdd() {
-    const _items = [...props.items];
+    console.log(typeof newTaskDate)
+    if (newTaskDate === undefined) {
+      alert("Is the date filled in?");
+    } else {
+      const _items = [...props.items];
 
-    const newTask = {
-      id: uuid(),
-      content: newContent,
-      date: new Date(newTaskDate.replace(/-/g, "/").replace("T", " ")), //need to reformat HTML date object's string to be kinder to JS
-      group: newGroup,
-      person: newPerson,
-      percentComplete: 0,
-    };
+      const newTask = {
+        id: uuid(),
+        content: newContent,
+        date: newTaskDate,
+        group: newGroup,
+        person: newPerson,
+        percentComplete: 0,
+      };
 
-    _items.push(newTask);
+      _items.push(newTask);
 
-    props.setItems(_items);
-    async function writeData() {
+      props.setItems(_items);
+      /*     async function writeData() {
       //if you want an auto generated id
       //const docRef = await addDoc(collection(db, "tasks"), docData);
       //console.log("Document written with ID: ", docRef.id);
 
       //If you want to set the id yourself
       await setDoc(doc(db, "tasks", newTask.id), newTask);
-    }
+    } */
 
-    writeData();
+      writeData(newTask);
+    }
   }
 
   return (
@@ -84,10 +88,7 @@ export default function AddTask(props) {
         placeholder="New Task's Person"
       />
       <br />
-      <button
-        className="add"
-        onClick={handleAdd}
-      >
+      <button className="add" onClick={handleAdd}>
         Add
       </button>
     </div>

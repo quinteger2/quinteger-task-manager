@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./EditTask.css";
-import { db } from "../firebase";
-import { updateDoc, doc } from "firebase/firestore";
+import { updateTask } from "../firebase";
 
 export default function EditTask(props) {
   const [content, setContent] = useState("");
@@ -11,27 +10,6 @@ export default function EditTask(props) {
   const [percentComplete, setPercentComplete] = useState("");
 
   const [oldTask, setOldTask] = useState({});
-
-  async function updateTask(
-    ref,
-    _content,
-    _date,
-    _group,
-    _person,
-    _percentComplete
-  ) {
-    try {
-      await updateDoc(ref, {
-        content: _content,
-        date: new Date(_date),
-        group: _group,
-        person: _person,
-        percentComplete: _percentComplete,
-      }).then(props.changeWriteState("success"));
-    } catch (e) {
-      props.changeWriteState("error");
-    }
-  }
 
   const onChangeContent = (event) => {
     setContent(event.target.value);
@@ -55,12 +33,15 @@ export default function EditTask(props) {
   };
 
   const handleSave = (event) => {
-    const ref = doc(db, "tasks", oldTask.id);
-
-    //console.log(newTaskDate);
-    //const newDate = new Date(newTaskDate.replace(/-/g,'/').replace('T',' ')); //need to reformat HTML date object's string to be kinder to JS
-
-    updateTask(ref, content, newTaskDate, group, person, percentComplete);
+    updateTask(
+      oldTask.id,
+      content,
+      newTaskDate,
+      group,
+      person,
+      percentComplete,
+      props.changeWriteState
+    );
     props.changeLocalItems(
       content,
       new Date(newTaskDate),
@@ -85,7 +66,7 @@ export default function EditTask(props) {
   }, [props.tasks, props.currentTask]);
 
   return (
-    <div className="EditTask" style={{width: props.editWidth}}>
+    <div className="EditTask" style={{ width: props.editWidth }}>
       <div className="inputGroup">
         <p>Task Description:</p>
         <input
@@ -123,6 +104,7 @@ export default function EditTask(props) {
         />
       </div>
       <div className="inputGroup">
+        <p>Date</p>
         <input
           type="text"
           className="newTaskDate"
@@ -131,7 +113,10 @@ export default function EditTask(props) {
         />
       </div>
       <div className="inputGroup">
-        <button className="Save" onClick={handleSave}>
+        <button className="delete" onClick={() => alert("Are you crazy?")}>
+          Delete
+        </button>
+        <button className="save" onClick={handleSave}>
           Save
         </button>
       </div>

@@ -3,7 +3,6 @@ import TaskList from "./TaskList";
 import "./Tasks.css";
 
 export default function Tasks(props) {
-
   //Props required:
   //writeState - indicates if a write (from EditTask) was successful or not. "" is acceptable if no write is recent
   //items - array of tasks which comes from Firestore
@@ -12,7 +11,6 @@ export default function Tasks(props) {
   //changeCurrentTask - function to change the currentTask
   //startDate - beginning of calendar range
   //endingDate - end of calendar range
-
 
   const [sortBy, setSortBy] = useState("content");
   const [filter, setFilterBy] = useState("all");
@@ -30,7 +28,8 @@ export default function Tasks(props) {
           type="radio"
           value={item.prop}
           name="sortBy"
-          checked={item.prop === sortBy} onChange={onChangeSort}
+          checked={item.prop === sortBy}
+          onChange={onChangeSort}
         />
         <label htmlFor="html">{item.label}</label>
         <br />
@@ -46,7 +45,13 @@ export default function Tasks(props) {
   const filterOptionsButtons = filterOptions.map((item) => {
     return (
       <div key={item.prop}>
-        <input type="radio" value={item.prop} name="filter" />
+        <input
+          type="radio"
+          value={item.prop}
+          name="filter"
+          checked={item.prop === filter}
+          onChange={onChangeFilter}
+        />
         <label htmlFor="html">{item.label}</label>
         <br />
       </div>
@@ -62,16 +67,17 @@ export default function Tasks(props) {
   }
 
   return (
-    <div className={"Tasks " + props.writeState} style={{width: props.taskWidth}}>
+    <div
+      className={"Tasks " + props.writeState}
+      style={{ width: props.taskWidth }}
+    >
       <h3>Tasks</h3>
       <p>Sort By: </p>
       <div className="sortBy">
         {sortOptionsButtons}
         <p>Filter: </p>
       </div>
-      <div className="filter" onChange={onChangeFilter}>
-        {filterOptionsButtons}
-      </div>
+      <div className="filter">{filterOptionsButtons}</div>
       <div className="displayRange"></div>
       <TaskList
         items={props.items}
