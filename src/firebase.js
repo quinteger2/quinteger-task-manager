@@ -1,5 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
+
 // Follow this pattern to import other Firebase services
 // import { } from 'firebase/<service>';
 import {
@@ -41,6 +42,25 @@ export const getTasks = async (_items) => {
     currentTask.person = doc.data().person;
     currentTask.percentComplete = doc.data().percentComplete;
     _items.push(currentTask);
+  });
+};
+
+export const getGroups = async (groups, groupsWithTasks) => {
+  const firestoreGroups = [];
+
+  const querySnapshot = await getDocs(collection(db, "tasks"));
+  querySnapshot.forEach((doc) => {
+    firestoreGroups.push(doc.data().group);
+    groupsWithTasks.push({group: doc.data().group, id: doc.data().id, content: doc.data().content});
+  });
+
+  let dedupedGroups = new Set(firestoreGroups);
+  console.log(groupsWithTasks.sort((a,b) => {
+    return a.group > b.group
+  }))
+  
+  dedupedGroups.forEach((group) => {
+    groups.push(group);
   });
 };
 

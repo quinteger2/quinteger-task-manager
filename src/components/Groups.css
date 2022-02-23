@@ -1,0 +1,19 @@
+button {
+  font-size: 1rem;
+}
+
+.GroupList {
+  margin: 0 auto;
+  width: 20rem;
+  text-align: center;
+}
+
+.groupLine {
+  margin: .75em;
+}
+
+.itemName {
+  cursor: pointer;
+  color: blue;
+  text-decoration: underline;
+}

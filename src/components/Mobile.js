@@ -2,8 +2,8 @@ import { getTasks } from "../firebase";
 import EditTask from "./EditTask";
 import AddTask from "./AddTask";
 import Tasks from "./Tasks";
-import React, { useEffect, useState, useContext } from "react";
-import { AppContext } from "../AppContext";
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 export default function Mobile() {
   //writeState - indicates if a write (from EditTask) was successful or not. "" is acceptable if no write is recent
@@ -14,11 +14,10 @@ export default function Mobile() {
   //startDate - beginning of calendar range
   //endingDate - end of calendar range
 
+  const [items, setItems] = useState([]);
+
   const dayInMilliseconds = 24 * 60 * 60 * 1000;
   const numberOfDaysToOffset = 4;
-  const context = useContext(AppContext);
-
-  const { items, setItems } = context;
 
   console.log(
     new Date(new Date().getTime() + numberOfDaysToOffset * dayInMilliseconds)
@@ -51,19 +50,26 @@ export default function Mobile() {
     setCurrentTask("");
   };
 
+  const goBack = () => {};
+
   const changeCurrentTask = (currentTask) => {
     setCurrentTask(currentTask);
   };
 
   useEffect(() => {
-    const _items = [];
-    getTasks(_items).then(() => {
-      setItems(_items);
-    });
-  }, [setItems]);
+    if (window.confirm("Firestore?")) {
+      const _items = [];
+      getTasks(_items).then(() => {
+        setItems(_items);
+      });
+    } else {
+      alert("Firestore rejected");
+    }
+  }, []);
 
   return (
     <>
+    <Link to="/groups" style={{ textDecoration: 'none', fontSize:"2em" }}>Groups</Link>
       {currentTask === "" ? (
         <div>
           <div
@@ -113,6 +119,9 @@ export default function Mobile() {
           currentTask={currentTask}
           changeLocalItems={changeLocalItems}
           changeWriteState={() => console.log("Add support for this")}
+          handleBack={() => {
+            setCurrentTask("");
+          }}
           editWidth="80vw"
         />
       )}

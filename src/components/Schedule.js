@@ -6,6 +6,7 @@ import CalendarTask from "./CalendarTask.js";
 import { getTasks, updateDate } from "../firebase";
 import EditTask from "./EditTask.js";
 import AddTask from "./AddTask.js";
+//import { AppContext } from "../AppContext";
 
 const onDragEnd = (result, columns, setColumns, items, currentTask, setCurrentTask) => {
   if (!result.destination) return;
@@ -114,7 +115,6 @@ function Schedule(props) {
     });
   }, []);
 
-  useEffect(() => {}, []);
 
   const changeCurrentTask = (currentTask) => {
     setCurrentTask(currentTask);
@@ -123,7 +123,6 @@ function Schedule(props) {
   const changeEditWriteState = (editWriteState) => {
     setEditWriteState(editWriteState);
     setTimeout(() => {
-      //console.log("Clearing out success color!");
       setEditWriteState("");
     }, 3000);
   };

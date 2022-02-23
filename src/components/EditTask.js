@@ -116,6 +116,9 @@ export default function EditTask(props) {
         <button className="delete" onClick={() => alert("Are you crazy?")}>
           Delete
         </button>
+        <button className="back" onClick={props.handleBack}>
+          Back
+        </button>
         <button className="save" onClick={handleSave}>
           Save
         </button>
