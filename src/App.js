@@ -7,7 +7,6 @@ import { AppContext } from "./AppContext";
 import Groups from './components/Groups'
 
 function App() {
-  //console.log(startDate)
 
   const [contextItems, setContextItems] = React.useState([]);
   const [throttle, setThrottle] = React.useState(50);
@@ -54,8 +53,8 @@ function App() {
       <Router>
         <AppContext.Provider value={initialContext}>
           <div>
-            <h1 className="appTitle">Envelope Calendaring</h1>
-            {/*width < breakpoint ? (
+            {/*<h1 className="appTitle">Envelope Calendaring</h1>*/}
+            {width < breakpoint ? (
               <h2 className="mobileTitle">
                 <p style={{ margin: "0 auto", width: "11em" }}>
                   Envelope Calendaring
@@ -63,7 +62,7 @@ function App() {
               </h2>
             ) : (
               <h1 className="appTitle">Envelope Calendaring</h1>
-            )*/}
+            )}
           </div>
           <Routes>
             <Route path="/about" element={<About />} />

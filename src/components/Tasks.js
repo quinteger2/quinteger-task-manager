@@ -81,9 +81,9 @@ export default function Tasks(props) {
       <div className="displayRange"></div>
       <TaskList
         items={props.items}
-        currentTask={props.currentTask}
+        currentTaskID={props.currentTaskID}
         changeLocalItems={props.changeLocalItems}
-        changeCurrentTask={props.changeCurrentTask}
+        changeCurrentTaskID={props.changeCurrentTaskID}
         sortBy={sortBy}
         filter={filter}
         startDate={props.startDate}

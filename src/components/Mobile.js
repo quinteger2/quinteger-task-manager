@@ -7,23 +7,20 @@ import { Link } from "react-router-dom";
 
 export default function Mobile() {
   //writeState - indicates if a write (from EditTask) was successful or not. "" is acceptable if no write is recent
-  //items - array of tasks which comes from Firestore
-  //currentTask - id of the task to be edited
+  //tasks - array of tasks which comes from Firestore
+  //currentTaskID - id of the task to be edited
   //changeLocalItems - function to change the local items array (stored separately from Firestore's list)
-  //changeCurrentTask - function to change the currentTask
+  //changeCurrentTaskID - function to change the currentTaskID
   //startDate - beginning of calendar range
   //endingDate - end of calendar range
 
-  const [items, setItems] = useState([]);
+  const [tasks, setTasks] = useState([]);
 
   const dayInMilliseconds = 24 * 60 * 60 * 1000;
   const numberOfDaysToOffset = 4;
 
-  console.log(
-    new Date(new Date().getTime() + numberOfDaysToOffset * dayInMilliseconds)
-  );
-
-  const [currentTask, setCurrentTask] = useState("");
+  const [currentTaskID, setCurrentTaskID] = useState("");
+  const [currentTask, setCurrentTask] = useState({});
   const [_startDate, setLocalStartDate] = useState(new Date());
   const [_endingDate, setLocalEndingDate] = useState(
     new Date(new Date().getTime() + numberOfDaysToOffset * dayInMilliseconds)
@@ -34,10 +31,10 @@ export default function Mobile() {
   );
 
   const changeLocalItems = (content, date, group, person, percentComplete) => {
-    const _items = [...items];
+    const _items = [...tasks];
 
     _items.forEach((item) => {
-      if (item.id === currentTask) {
+      if (item.id === currentTaskID) {
         item.content = content;
         item.date = date;
         item.group = group;
@@ -46,31 +43,54 @@ export default function Mobile() {
       }
     });
 
-    setItems(_items);
-    setCurrentTask("");
+    setTasks(_items);
+    setCurrentTaskID("");
   };
 
-  const goBack = () => {};
-
-  const changeCurrentTask = (currentTask) => {
-    setCurrentTask(currentTask);
+  const changeCurrentTaskID = (currentTaskID) => {
+    //If we are setting currentTaskID to a value, we want to get the whole task for that ID now. Then we can pass that to EditTask (if chosen)
+    if (currentTaskID !== "") {
+      const _currentTask = {};
+      tasks.forEach((item) => {
+        if (item.id === currentTaskID) {
+          console.log("Content is: " + item.content)
+          _currentTask.id = item.id
+          _currentTask.content = item.content;
+          _currentTask.date = new Date(item.date);
+          _currentTask.group = item.group;
+          _currentTask.person = item.person;
+          _currentTask.percentComplete = item.percentComplete;
+        }
+      });
+      //write this new task to state
+      setCurrentTask(_currentTask)
+    }
+    //this gets set to currentTaskID, whether it is a value, or the empty string
+    setCurrentTaskID(currentTaskID);
   };
 
-  useEffect(() => {
+  const fetchTasks = () => {
     if (window.confirm("Firestore?")) {
       const _items = [];
       getTasks(_items).then(() => {
-        setItems(_items);
+        setTasks(_items);
       });
     } else {
       alert("Firestore rejected");
     }
+
+  }
+
+  useEffect(() => {
+    fetchTasks()
   }, []);
 
   return (
     <>
-    <Link to="/groups" style={{ textDecoration: 'none', fontSize:"2em" }}>Groups</Link>
-      {currentTask === "" ? (
+      <Link to="/groups" style={{ textDecoration: "none", fontSize: "2em" }}>
+        Groups
+      </Link>
+      {currentTaskID === "" ? (
         <div>
           <div
             className="inputGroup"
@@ -103,25 +123,22 @@ export default function Mobile() {
           </div>
           <Tasks
             writeState=""
-            items={items}
-            currentTask=""
+            items={tasks}
+            currentTaskID=""
             changeLocalItems={changeLocalItems}
-            changeCurrentTask={changeCurrentTask}
+            changeCurrentTaskID={changeCurrentTaskID}
             startDate={startDate}
             endingDate={endingDate}
             taskWidth="80vw"
           />
-          <AddTask items={items} setItems={setItems} addWidth="80vw" />
+          <AddTask items={tasks} setTasks={setTasks} addWidth="80vw" />
         </div>
       ) : (
         <EditTask
-          tasks={items}
           currentTask={currentTask}
-          changeLocalItems={changeLocalItems}
           changeWriteState={() => console.log("Add support for this")}
-          handleBack={() => {
-            setCurrentTask("");
-          }}
+          changeCurrentTaskID={changeCurrentTaskID}
+          forceFetchTasks={fetchTasks}
           editWidth="80vw"
         />
       )}

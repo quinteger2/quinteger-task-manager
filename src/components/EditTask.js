@@ -1,15 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import "./EditTask.css";
 import { updateTask } from "../firebase";
 
 export default function EditTask(props) {
-  const [content, setContent] = useState("");
-  const [newTaskDate, setNewTaskDate] = useState("");
-  const [group, setGroup] = useState("");
-  const [person, setPerson] = useState("");
-  const [percentComplete, setPercentComplete] = useState("");
-
-  const [oldTask, setOldTask] = useState({});
+  
+  const [content, setContent] = useState(props.currentTask.content);
+  const [date, setNewTaskDate] = useState(new Date(props.currentTask.date));
+  const [group, setGroup] = useState(props.currentTask.group);
+  const [person, setPerson] = useState(props.currentTask.person);
+  const [percentComplete, setPercentComplete] = useState(props.currentTask.percentComplete);
 
   const onChangeContent = (event) => {
     setContent(event.target.value);
@@ -28,42 +27,26 @@ export default function EditTask(props) {
   };
 
   const onChangeTaskDate = (event) => {
-    //console.log(newTaskDate);
     setNewTaskDate(event.target.value);
   };
 
   const handleSave = (event) => {
+    console.log(props.currentTask.id + ' ' + content + ' ' + date + ' ' + group + ' ' + person + ' ' + percentComplete + ' ' + props.changeWriteState)
+    
     updateTask(
-      oldTask.id,
+      props.currentTask.id,
       content,
-      newTaskDate,
+      date,
       group,
       person,
       percentComplete,
       props.changeWriteState
     );
-    props.changeLocalItems(
-      content,
-      new Date(newTaskDate),
-      group,
-      person,
-      percentComplete
-    );
+    props.changeCurrentTaskID("")
+    props.forceFetchTasks()
   };
 
-  useEffect(() => {
-    props.tasks.forEach((item) => {
-      if (item.id === props.currentTask) {
-        setOldTask(item);
-        setContent(item.content);
-        setNewTaskDate(new Date(item.date));
-        setGroup(item.group);
-        setPerson(item.person);
-        setPercentComplete(item.percentComplete);
-      }
-    });
-    //console.log(setNewTaskDate);
-  }, [props.tasks, props.currentTask]);
+  console.log(props.currentTask)
 
   return (
     <div className="EditTask" style={{ width: props.editWidth }}>
@@ -107,8 +90,8 @@ export default function EditTask(props) {
         <p>Date</p>
         <input
           type="text"
-          className="newTaskDate"
-          value={newTaskDate}
+          className="date"
+          value={date}
           onChange={onChangeTaskDate}
         />
       </div>
@@ -116,7 +99,7 @@ export default function EditTask(props) {
         <button className="delete" onClick={() => alert("Are you crazy?")}>
           Delete
         </button>
-        <button className="back" onClick={props.handleBack}>
+        <button className="back" onClick={() => props.changeCurrentTaskID("")}>
           Back
         </button>
         <button className="save" onClick={handleSave}>

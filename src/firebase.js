@@ -45,20 +45,28 @@ export const getTasks = async (_items) => {
   });
 };
 
-export const getGroups = async (groups, groupsWithTasks) => {
+export const getGroups = async (groups, groupsWithDetails) => {
   const firestoreGroups = [];
 
   const querySnapshot = await getDocs(collection(db, "tasks"));
   querySnapshot.forEach((doc) => {
+    
+    //get a list of groups (not deduped)
     firestoreGroups.push(doc.data().group);
-    groupsWithTasks.push({group: doc.data().group, id: doc.data().id, content: doc.data().content});
+    
+    //get an array of objects with all the task data
+    groupsWithDetails.push({
+      group: doc.data().group,
+      id: doc.data().id,
+      content: doc.data().content,
+      date: new Date(doc.data().date.seconds * 1000),
+      person: doc.data().person,
+      percentComplete: doc.data().percentComplete,
+    });
   });
 
   let dedupedGroups = new Set(firestoreGroups);
-  console.log(groupsWithTasks.sort((a,b) => {
-    return a.group > b.group
-  }))
-  
+
   dedupedGroups.forEach((group) => {
     groups.push(group);
   });
@@ -84,6 +92,7 @@ export const updateTask = async (
 ) => {
   const ref = doc(db, "tasks", id);
   try {
+    console.log("PC: " + _percentComplete)
     await updateDoc(ref, {
       content: _content,
       date: new Date(_date),

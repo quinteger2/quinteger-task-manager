@@ -25,7 +25,7 @@ export default function AddTask(props) {
   };
 
   function handleAdd() {
-    console.log(typeof newTaskDate)
+    
     if (newTaskDate === undefined) {
       alert("Is the date filled in?");
     } else {

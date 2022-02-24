@@ -7,7 +7,7 @@ function TaskListItem(props) {
       <p>{`${props.item.content} (${props.item.date.toLocaleDateString()}, ${
         props.item.percentComplete
       }%) ${props.item.person}`}</p>
-      <button onClick={() => props.changeCurrentTask(props.item.id)}>
+      <button onClick={() => props.changeCurrentTaskID(props.item.id)}>
         Edit
       </button>
     </div>
@@ -49,7 +49,6 @@ export default function TaskList(props) {
       filteredItems = sortedItems.filter(
         (item) => item.date >= props.startDate && item.date <= props.endingDate
       );
-      console.log(new Date(props.startDate) + " " + new Date(props.endingDate));
       break;
     default:
       filteredItems = sortedItems;
@@ -58,7 +57,7 @@ export default function TaskList(props) {
   const final_product = filteredItems.map((item) => (
     <TaskListItem
       key={item.id}
-      changeCurrentTask={props.changeCurrentTask}
+      changeCurrentTaskID={props.changeCurrentTaskID}
       item={item}
     />
   ));
